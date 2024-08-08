@@ -11,7 +11,7 @@ import androidx.work.WorkerParameters
 import java.util.concurrent.TimeUnit
 
 
-class HttpTaskWorker(private val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
+class HttpTaskWorker(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
     override suspend fun doWork(): Result {
         Log.d("service", "Received broadcast event for Coroutine Worker")
         return Result.success()

@@ -1,6 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.hilt.plugin)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 android {
@@ -37,7 +40,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.13"
     }
     packaging {
         resources {
@@ -63,4 +66,19 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // retrofit and gson
+    implementation(libs.retrofit.gson)
+    implementation(libs.gson)
+
+    // di
+    implementation(libs.javax.inject)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    kspAndroidTest(libs.hilt.compiler)
+
+    // compose navigation
+    implementation(libs.compose.navigation)
+    implementation(libs.compose.hilt.navigation)
+    implementation(libs.kotlinx.serialization.json)
 }
