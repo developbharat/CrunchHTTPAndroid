@@ -8,7 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.developbharat.crunchhttp.common.Routes
-import com.developbharat.crunchhttp.ui.screens.accounts.signin.SigninScreen
+import com.developbharat.crunchhttp.ui.screens.start.StartScreen
 import com.developbharat.crunchhttp.ui.theme.CrunchHTTPTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -20,10 +20,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             CrunchHTTPTheme {
                 val navController = rememberNavController()
-                NavHost(navController = navController, startDestination = Routes.SigninScreen) {
+                NavHost(navController = navController, startDestination = Routes.StartScreen) {
                     // Start and Home Screens
-                    composable<Routes.SigninScreen> {
-                        SigninScreen()
+                    composable<Routes.StartScreen> {
+                        StartScreen()
                     }
                 }
             }

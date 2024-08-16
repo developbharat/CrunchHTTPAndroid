@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.hilt.plugin)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.apollo)
 }
 
 android {
@@ -20,6 +21,19 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
+        }
+
+        apollo {
+            service("localhost") {
+                packageName.set("com.developbharat.crunchhttp")
+                srcDir("src/main/java/com/developbharat/crunchhttp/graphql/")
+                includes.add("**/*.graphql")
+                generateKotlinModels = true
+                introspection {
+                    endpointUrl.set("http://localhost:4000/graphql")
+                    schemaFile.set(file("src/main/java/com/developbharat/crunchhttp/graphql/schema.graphqls"))
+                }
+            }
         }
     }
 
@@ -67,8 +81,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    // retrofit and gson
-    implementation(libs.retrofit.gson)
+    // gson
     implementation(libs.gson)
 
     // di
@@ -81,4 +94,7 @@ dependencies {
     implementation(libs.compose.navigation)
     implementation(libs.compose.hilt.navigation)
     implementation(libs.kotlinx.serialization.json)
+
+    // graphql
+    implementation(libs.apollo.runtime)
 }

@@ -1,0 +1,6 @@
+
+query IsDeviceAuthenticated{
+    isDeviceAuthenticated {
+        ...ClientDevice
+    }
+}

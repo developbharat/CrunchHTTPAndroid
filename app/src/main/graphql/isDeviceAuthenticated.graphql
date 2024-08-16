@@ -1,0 +1,9 @@
+query isDeviceAuthenticated{
+  isDeviceAuthenticated{
+    id
+    name
+    device_id
+    device_type
+    created_at
+  }
+}

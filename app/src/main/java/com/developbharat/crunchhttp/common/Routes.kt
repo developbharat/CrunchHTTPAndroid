@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed interface Routes {
-    // Authentication Screens
     @Serializable
-    data object SigninScreen : Routes
+    data object StartScreen : Routes
 }

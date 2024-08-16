@@ -1,0 +1,7 @@
+fragment ClientDevice on ClientDevice{
+    id
+    name
+    device_id
+    device_type
+    created_at
+}
