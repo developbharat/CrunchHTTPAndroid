@@ -9,6 +9,11 @@ type Query {
   Allows an authenticated user to list http tasks associated with his account.
   """
   listUserAccountTasks(data: ListUserAccountTasksInput!): [HttpTask!]!
+
+  """
+  Allows an authenticated device to list http tasks to work with.
+  """
+  listClientDeviceTasks: [HttpTask!]!
 }
 
 type UserAccount {
@@ -57,13 +62,13 @@ type HttpTask {
 
   headers: String!
 
-  data: String!
+  data: String
 
   success_status_codes: [Int!]!
 
   max_retries: Int!
 
-  expires_at: DateTimeISO!
+  expires_at: DateTimeISO
 
   status: HttpTaskStatus!
 
@@ -105,7 +110,14 @@ type Mutation {
 
   unBlockDevice(data: UnBlockDeviceInput!): ClientDevice!
 
+  """
+  Allows an authenticated device to update its own batch size.
+  """
+  setDeviceBatchSize(data: SetDeviceBatchSizeInput!): ClientDevice!
+
   createNewHttpTask(data: CreateHttpTaskInput!): HttpTask!
+
+  submitHttpTaskResults(data: [SubmitHttpTaskResultInput!]!): [ID!]!
 }
 
 input SignupInput {
@@ -140,6 +152,10 @@ input UnBlockDeviceInput {
   id: ID!
 }
 
+input SetDeviceBatchSizeInput {
+  batch_size: Int!
+}
+
 input CreateHttpTaskInput {
   path: String!
 
@@ -157,6 +173,23 @@ input CreateHttpTaskInput {
   max_retries: Int!
 
   success_status_codes: [Int!]!
+}
+
+input SubmitHttpTaskResultInput {
+  task_id: ID!
+
+  data: String!
+
+  """
+  A stringified JSON object with (Key: String) and (Value: String). Ex: {'accepts': 'application/json'}
+  """
+  headers: String!
+
+  is_success: Boolean!
+
+  status: String!
+
+  status_code: Int!
 }
 
 """

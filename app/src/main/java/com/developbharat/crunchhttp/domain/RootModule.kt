@@ -3,6 +3,7 @@ package com.developbharat.crunchhttp.domain
 import android.annotation.SuppressLint
 import android.content.Context
 import android.provider.Settings
+import androidx.work.WorkManager
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.http.HttpMethod
 import com.developbharat.crunchhttp.common.Constants
@@ -20,7 +21,7 @@ object RootModule {
     @SuppressLint("HardwareIds")
     @Provides
     @Singleton
-    fun providesApolloClient(@ApplicationContext() context: Context): ApolloClient{
+    fun providesApolloClient(@ApplicationContext() context: Context): ApolloClient {
         // Read device id
         val contentResolver = context.contentResolver
         val androidId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
@@ -32,4 +33,5 @@ object RootModule {
             .httpMethod(HttpMethod.Post)
             .build()
     }
+
 }

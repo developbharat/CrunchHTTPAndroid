@@ -5,3 +5,16 @@ fragment ClientDevice on ClientDevice{
     device_type
     created_at
 }
+
+fragment HttpTask on HttpTask{
+    id
+    method
+    path
+    headers
+    data
+    max_retries
+    status
+    success_status_codes
+    created_at
+    expires_at
+}

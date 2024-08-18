@@ -5,7 +5,6 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- TODO: Add this flag in during localhost development to redirect traffic from emulator to localhost -->
-    <!--  android:usesCleartextTraffic="true"-->
     <application
         android:name=".MainApplication"
         android:allowBackup="true"
@@ -16,6 +15,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CrunchHTTP"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
             android:name=".MainActivity"
@@ -29,20 +29,12 @@
         </activity>
 
 
-        <!--  Note: Receiver Will work only below Android Version 7, for others we have implemented CoroutineWorker -->
-        <service
-            android:name="androidx.work.impl.foreground.SystemForegroundService"
-            android:foregroundServiceType="dataSync"
-            tools:node="merge" />
-        <receiver
-            android:name=".services.HttpTaskBroadcastReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action
-                    android:name="android.net.conn.CONNECTIVITY_CHANGE"
-                    tools:ignore="BatteryLife" />
-            </intent-filter>
-        </receiver>
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            tools:node="remove"
+            android:exported="false"
+            />
     </application>
 
 </manifest>

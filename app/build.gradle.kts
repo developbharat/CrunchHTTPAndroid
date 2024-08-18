@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.developbharat.crunchhttp"
-        minSdk = 21
+        minSdk = 25
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -72,7 +72,6 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.work.runtime.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -87,6 +86,7 @@ dependencies {
     // di
     implementation(libs.javax.inject)
     implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.common)
     ksp(libs.hilt.compiler)
     kspAndroidTest(libs.hilt.compiler)
 
@@ -97,4 +97,8 @@ dependencies {
 
     // graphql
     implementation(libs.apollo.runtime)
+
+    // service workers
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.hilt.work)
 }

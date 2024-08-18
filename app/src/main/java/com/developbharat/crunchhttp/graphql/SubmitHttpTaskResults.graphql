@@ -1,0 +1,3 @@
+mutation SubmitHttpTaskResults($data: [SubmitHttpTaskResultInput!]!) {
+    submitHttpTaskResults(data: $data)
+}

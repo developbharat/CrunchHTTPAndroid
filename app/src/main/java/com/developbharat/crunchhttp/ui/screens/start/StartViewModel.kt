@@ -46,6 +46,7 @@ class StartViewModel @Inject constructor(
     fun checkDeviceId(context: Context): String {
         val contentResolver = context.contentResolver
         val androidId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+        Log.d("deviceId", androidId)
         return androidId
     }
 }
