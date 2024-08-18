@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
                 NavHost(navController = navController, startDestination = Routes.StartScreen) {
                     // Start and Home Screens
                     composable<Routes.StartScreen> {
-                        StartScreen()
+                        StartScreen(appContext = applicationContext)
                     }
                 }
             }

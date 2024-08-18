@@ -22,7 +22,7 @@ class StartViewModel @Inject constructor(
     val state: State<StartState> = _state
 
 
-    fun checkIsDeviceAuthenticated(): Unit {
+    fun checkIsDeviceAuthenticated() {
         // Set current state to loading
         _state.value = _state.value.copy(isInProgress = true)
 
