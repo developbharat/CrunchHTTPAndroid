@@ -86,7 +86,6 @@ dependencies {
     // di
     implementation(libs.javax.inject)
     implementation(libs.hilt.android)
-    implementation(libs.androidx.hilt.common)
     ksp(libs.hilt.compiler)
     kspAndroidTest(libs.hilt.compiler)
 
@@ -99,6 +98,14 @@ dependencies {
     implementation(libs.apollo.runtime)
 
     // service workers
-    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.hilt.common)
     implementation(libs.androidx.hilt.work)
+    ksp(libs.androidx.hilt.compiler)
+    implementation(libs.androidx.work.runtime.ktx)
+
+    // sqlite database + room db
+    implementation(libs.sqlcipher)
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
 }

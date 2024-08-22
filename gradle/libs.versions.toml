@@ -19,8 +19,9 @@ hiltNavigation = "1.2.0"
 kotlinxSerializationJson = "1.6.3"
 kotlinxSerialization = "1.9.23"
 apollo = "4.0.0"
-hiltCommon = "1.2.0"
 hiltWork = "1.2.0"
+roomDb = "2.6.1"
+sqlcipher = "4.5.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -45,9 +46,14 @@ compose-navigation = { module = "androidx.navigation:navigation-compose", versio
 compose-hilt-navigation = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigation" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 apollo-runtime = { module = "com.apollographql.apollo:apollo-runtime", version.ref = "apollo"}
-androidx-hilt-common = { group = "androidx.hilt", name = "hilt-common", version.ref = "hiltCommon" }
+androidx-hilt-common = { group = "androidx.hilt", name = "hilt-common", version.ref = "hiltWork" }
 androidx-hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "hiltWork" }
+androidx-hilt-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "hiltWork" }
 androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtx" }
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomDb" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomDb" }
+room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomDb" }
+sqlcipher = { module = "net.zetetic:android-database-sqlcipher", version.ref = "sqlcipher" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

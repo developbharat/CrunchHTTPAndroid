@@ -1,8 +1,6 @@
-package com.developbharat.crunchhttp.services
+package com.developbharat.crunchhttp.workers
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.provider.Settings
 import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.Constraints
@@ -15,12 +13,11 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.apollographql.apollo.ApolloClient
-import com.apollographql.apollo.api.http.HttpMethod
 import com.developbharat.crunchhttp.ListClientDeviceTasksQuery
 import com.developbharat.crunchhttp.SubmitHttpTaskResultsMutation
-import com.developbharat.crunchhttp.common.Constants
+import com.developbharat.crunchhttp.domain.data.database.MainDatabase
+import com.developbharat.crunchhttp.domain.models.HttpTaskResult
 import com.developbharat.crunchhttp.fragment.HttpTask
-import com.developbharat.crunchhttp.type.SubmitHttpTaskResultInput
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
@@ -38,18 +35,11 @@ import java.util.concurrent.TimeUnit
 class HttpTaskWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
+    private val apolloClient: ApolloClient,
+    private val db: MainDatabase
 ) : CoroutineWorker(context, workerParams) {
-    private val apolloClient: ApolloClient = provideApolloClient()
     private var lastBlankAttemptsCount: Int = 0
 
-    @SuppressLint("HardwareIds")
-    fun provideApolloClient(): ApolloClient {
-        val contentResolver = applicationContext.contentResolver
-        val androidId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
-
-        return ApolloClient.Builder().serverUrl(Constants.GRAPHQL_URL).addHttpHeader("Authorization", androidId)
-            .addHttpHeader("Content-Type", "application/json").httpMethod(HttpMethod.Post).build()
-    }
 
     override suspend fun doWork(): Result {
         Log.d("service", "Received broadcast event for Coroutine Worker")
@@ -60,17 +50,30 @@ class HttpTaskWorker @AssistedInject constructor(
 
             // increase lastBlankAttempt count if we have 0 tasks
             // and continue loop next iteration.
+            // otherwise reset attempts to 0
             if (tasks.isEmpty()) {
                 this.lastBlankAttemptsCount++
+                delay(2000) // wait for 2 seconds
                 continue
+            } else {
+                this.lastBlankAttemptsCount = 0
             }
 
-            // TODO: Store responses in sqlite database
+            /**
+             * TODO: storing in db is useless as of now, as we don't have worker to upload them periodically
+             * will add a worker in future that runs every 1 hour and uploads all tasks(Task Results) whose associated task id is not yet expired.
+             * This will also require us to store tasks along with their ids (And only persist whose expiry is a bit forward)
+             *
+             * TODO: And it also doesn't make sense to store them, as backend is automatically assigning them to another device or reassigning to current device after every 30 minutes.
+             * so it will be useful only if tasks are submitted within 30 minutes from the time they were fetched from backend.
+             */
             val responses = this.solveTasks(tasks)
+//            db.httpTaskResultDao().insert(responses.map { it.toDatabaseRecord() })
             Log.d("service", "Solved ${responses.size} tasks")
 
-            // TODO: Remove uploaded id from sqlite database
+            // TODO: Remove uploaded ids from sqlite database
             val ids = uploadHttpResponses(responses)
+//            db.httpTaskResultDao().deleteWithTaskIds(ids)
             Log.d("service", "Uploaded ${ids.size} tasks")
         }
         return Result.success()
@@ -83,8 +86,9 @@ class HttpTaskWorker @AssistedInject constructor(
         return tasks.data!!.listClientDeviceTasks.map { it.httpTask }
     }
 
-    private suspend fun uploadHttpResponses(responses: List<SubmitHttpTaskResultInput>): List<String> {
-        val ids = apolloClient.mutation(SubmitHttpTaskResultsMutation(responses)).execute()
+    private suspend fun uploadHttpResponses(responses: List<HttpTaskResult>): List<String> {
+        val data = responses.map { it.toGraphQLInput() }
+        val ids = apolloClient.mutation(SubmitHttpTaskResultsMutation(data)).execute()
         if (ids.hasErrors() || ids.data == null) return emptyList()
 
         // return ids from submission of http responses
@@ -92,25 +96,25 @@ class HttpTaskWorker @AssistedInject constructor(
 
     }
 
-    private suspend fun solveTasks(tasks: List<HttpTask>): List<SubmitHttpTaskResultInput> =
+    private suspend fun solveTasks(tasks: List<HttpTask>): List<HttpTaskResult> =
         withContext(Dispatchers.IO) {
             return@withContext tasks.map { async { solveTask(it) } }.awaitAll()
         }
 
-    private suspend fun solveTask(task: HttpTask): SubmitHttpTaskResultInput {
+    private suspend fun solveTask(task: HttpTask): HttpTaskResult {
         var attempts = 0
-        var failedResult = SubmitHttpTaskResultInput(
-            task_id = task.id,
+        var failedResult = HttpTaskResult(
+            taskId = task.id,
             data = "",
             headers = "",
             status = "Android Client Device Worker Exception Occurred.",
-            status_code = 0,
-            is_success = false
+            statusCode = 0,
+            isSuccess = false
         )
         while (attempts <= task.max_retries) {
             try {
                 val result = this.makeHttpRequest(task)
-                if (result.is_success) return result
+                if (result.isSuccess) return result
 
                 // update failed result with failed response
                 failedResult = result
@@ -127,7 +131,7 @@ class HttpTaskWorker @AssistedInject constructor(
         return failedResult
     }
 
-    private suspend fun makeHttpRequest(task: HttpTask): SubmitHttpTaskResultInput = withContext(Dispatchers.IO) {
+    private suspend fun makeHttpRequest(task: HttpTask): HttpTaskResult = withContext(Dispatchers.IO) {
         // set request path and method
         val connection = URL(task.path).openConnection() as HttpURLConnection
         connection.requestMethod = task.method.rawValue
@@ -155,24 +159,24 @@ class HttpTaskWorker @AssistedInject constructor(
 
         // Return failure response if request failed
         if (!task.success_status_codes.contains(statusCode)) {
-            return@withContext SubmitHttpTaskResultInput(
-                task_id = task.id,
+            return@withContext HttpTaskResult(
+                taskId = task.id,
                 data = content,
                 headers = headers,
-                is_success = false,
+                isSuccess = false,
                 status = status,
-                status_code = statusCode
+                statusCode = statusCode
             )
         }
 
         // return success response if request succeeds
-        return@withContext SubmitHttpTaskResultInput(
-            task_id = task.id,
+        return@withContext HttpTaskResult(
+            taskId = task.id,
             data = content,
             headers = headers,
-            is_success = true,
+            isSuccess = true,
             status = status,
-            status_code = statusCode
+            statusCode = statusCode
         )
     }
 

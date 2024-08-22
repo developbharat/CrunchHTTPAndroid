@@ -15,7 +15,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.developbharat.crunchhttp.services.HttpTaskWorker
+import com.developbharat.crunchhttp.workers.HttpTaskWorker
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
